@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <!-- load in google fonts -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat|Playfair+Display:900"
+      rel="stylesheet"
+    />
+    <!-- load in setup -->
+    <link rel="stylesheet" href="styles/setup.css" />
+    <!-- load in styles -->
+    <link rel="stylesheet" href="styles/styles.css" />
+    <title>Gif Finder</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <div class="heading-text">
+          <h1>The <br />Gif Finder</h1>
+        </div>
+
+        <form action="#">
+          <label for="search-input">search keyword</label>
+
+          <div class="search-bar">
+            <input type="text" placeholder="kittens" id="search-input" />
+            <input type="submit" value="search" />
+          </div>
+        </form>
+      </header>
+
+      <section class="results"></section>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script>
+      // create namespace
+      // store API key
+      // create document.ready, pass in app.init()
+      const app = {};
+      // gifs is receiving results.data array
+      // loop & display - we don't require a new array back, let's use forEach
+      app.displayImages = (gifs) => {
+        gifs.forEach((gif) => {
+          //   console.log(gif);
+          $(".results").append(`
+            <div class="gif-box">
+                <div class="img-box">
+                    <img src=${gif.images.fixed_height.url} alt=${gif.title}/>
+                </div>
+            </div>
+          `);
+        });
+      };
+
+      // AJAX Call
+      app.getGifs = (query) => {
+        $.ajax({
+          url: "http://api.giphy.com/v1/gifs/search",
+          method: "GET",
+          dataType: "json",
+          data: {
+            api_key: "sPYJ6NSTj5elcDD3nfzf49E2vf0VE3OE",
+            q: query,
+          },
+        }).then((results) => {
+          // console.log(results);
+          // pass this information into displayImages function
+          $(".results").empty();
+          app.displayImages(results.data);
+        });
+      };
+      // Initializes App
+      app.init = () => {
+        $("form").on("submit", (e) => {
+          e.preventDefault();
+          const userSearch = $("input[type=text]").val();
+          console.log(userSearch);
+          // make API call, pass info from search bar
+          app.getGifs(userSearch);
+          $(".input[type=text]").val(" ");
+        });
+      };
+      // userSearch is now available in our AJAX call!
+      // query at this point is the value we retrieved from our form
+
+      // document.ready
+      $(() => app.init());
+
+      // Notes on Giphy Docs
+      // required params: api_key, q:, api endpoint
+      // additional pieces of info, use data object!
+      // then param could be called result, res, data etc.
+      // remember to add HTTP otherwise you will get a CORS error
+      // don't write $ in front of variable unless you're storing an element
+    </script>
+  </body>
+</html>
